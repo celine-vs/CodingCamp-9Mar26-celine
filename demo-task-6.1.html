@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 6.1 Demo - Task Rendering</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; }
+        .demo-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            margin: 8px 0;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .task-item.completed {
+            background: #e8f5e9;
+            opacity: 0.8;
+        }
+        .task-item.completed .task-description {
+            text-decoration: line-through;
+            color: #666;
+        }
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .task-description {
+            flex: 1;
+            font-size: 16px;
+        }
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-edit-task {
+            background: #2196F3;
+            color: white;
+        }
+        .btn-delete-task {
+            background: #f44336;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        .demo-button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-left: 4px solid #2196F3;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task 6.1 Demo: Task Rendering Methods</h1>
+    
+    <div class="demo-section">
+        <h2>Demo Controls</h2>
+        <button class="demo-button" onclick="demo1()">Demo 1: Render 3 Tasks</button>
+        <button class="demo-button" onclick="demo2()">Demo 2: Completed Tasks</button>
+        <button class="demo-button" onclick="demo3()">Demo 3: Mixed Tasks</button>
+        <button class="demo-button" onclick="clearTasks()">Clear All</button>
+    </div>
+
+    <div class="demo-section">
+        <h2>Task List</h2>
+        <div class="info">
+            <strong>Features Demonstrated:</strong>
+            <ul>
+                <li>✓ renderTasks() updates entire list</li>
+                <li>✓ renderTask() creates individual task elements</li>
+                <li>✓ data-task-id attribute on each task</li>
+                <li>✓ Checkbox, description, edit, and delete buttons</li>
+                <li>✓ Completed class and styling for finished tasks</li>
+                <li>✓ Tasks displayed in creation order (Req 3.2)</li>
+            </ul>
+        </div>
+        <ul class="task-list"></ul>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        function demo1() {
+            TaskManager.tasks = [
+                { id: '1', description: 'Buy groceries', completed: false, createdAt: 1 },
+                { id: '2', description: 'Write report', completed: false, createdAt: 2 },
+                { id: '3', description: 'Call dentist', completed: false, createdAt: 3 }
+            ];
+            TaskManager.renderTasks();
+            console.log('Demo 1: Rendered 3 incomplete tasks');
+        }
+
+        function demo2() {
+            TaskManager.tasks = [
+                { id: '4', description: 'Morning workout', completed: true, createdAt: 4 },
+                { id: '5', description: 'Read chapter 5', completed: true, createdAt: 5 }
+            ];
+            TaskManager.renderTasks();
+            console.log('Demo 2: Rendered 2 completed tasks');
+        }
+
+        function demo3() {
+            TaskManager.tasks = [
+                { id: '6', description: 'Prepare presentation', completed: false, createdAt: 6 },
+                { id: '7', description: 'Review pull requests', completed: true, createdAt: 7 },
+                { id: '8', description: 'Update documentation', completed: false, createdAt: 8 },
+                { id: '9', description: 'Team meeting notes', completed: true, createdAt: 9 },
+                { id: '10', description: 'Plan sprint', completed: false, createdAt: 10 }
+            ];
+            TaskManager.renderTasks();
+            console.log('Demo 3: Rendered 5 mixed tasks (some completed)');
+        }
+
+        function clearTasks() {
+            TaskManager.tasks = [];
+            TaskManager.renderTasks();
+            console.log('Cleared all tasks');
+        }
+
+        // Initial demo
+        console.log('Task 6.1 Demo loaded. Click buttons to see rendering in action!');
+    </script>
+</body>
+</html>

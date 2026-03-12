@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functional Test - Task 9.1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        h2 { color: #666; border-bottom: 2px solid #4a90e2; padding-bottom: 10px; }
+        .test-result { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover { background-color: #357abd; }
+        .code-block {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task 9.1 Functional Test</h1>
+    <p>Testing App object initialization and Local Storage availability check</p>
+
+    <div class="test-container">
+        <h2>Test 1: App Object Methods</h2>
+        <div id="test1-results"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 2: Local Storage Availability</h2>
+        <div id="test2-results"></div>
+        <button onclick="testStorageCheck()">Run Storage Check</button>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 3: Component Initialization</h2>
+        <div id="test3-results"></div>
+        <button onclick="testComponentInit()">Check Component Initialization</button>
+    </div>
+
+    <div class="test-container">
+        <h2>Test 4: Storage Warning Display</h2>
+        <div id="test4-results"></div>
+        <button onclick="testStorageWarning()">Simulate Storage Warning</button>
+    </div>
+
+    <!-- Hidden elements for component initialization -->
+    <div style="display: none;">
+        <div class="time-display"></div>
+        <div class="date-display"></div>
+        <div class="greeting-message"></div>
+        <div class="timer-display"></div>
+        <button class="btn-start"></button>
+        <button class="btn-stop"></button>
+        <button class="btn-reset"></button>
+        <ul class="task-list"></ul>
+        <div class="links-container"></div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Test 1: Check App object methods
+        function test1() {
+            const results = document.getElementById('test1-results');
+            let html = '';
+
+            const tests = [
+                { name: 'App object exists', check: typeof App !== 'undefined' },
+                { name: 'App.init() exists', check: typeof App.init === 'function' },
+                { name: 'App.isLocalStorageAvailable() exists', check: typeof App.isLocalStorageAvailable === 'function' },
+                { name: 'App.displayStorageWarning() exists', check: typeof App.displayStorageWarning === 'function' }
+            ];
+
+            tests.forEach(test => {
+                const className = test.check ? 'pass' : 'fail';
+                const status = test.check ? '✓ PASS' : '✗ FAIL';
+                html += `<div class="test-result ${className}">${status}: ${test.name}</div>`;
+            });
+
+            results.innerHTML = html;
+        }
+
+        // Test 2: Storage availability check
+        function testStorageCheck() {
+            const results = document.getElementById('test2-results');
+            const isAvailable = App.isLocalStorageAvailable();
+            const className = isAvailable ? 'pass' : 'info';
+            
+            results.innerHTML = `
+                <div class="test-result ${className}">
+                    Local Storage Available: ${isAvailable ? 'Yes ✓' : 'No (Private browsing or disabled)'}
+                </div>
+                <div class="test-result info">
+                    Return type: ${typeof isAvailable} (expected: boolean)
+                </div>
+            `;
+        }
+
+        // Test 3: Component initialization
+        function testComponentInit() {
+            const results = document.getElementById('test3-results');
+            let html = '';
+
+            const components = [
+                { name: 'GreetingWidget', obj: typeof GreetingWidget !== 'undefined' },
+                { name: 'FocusTimer', obj: typeof FocusTimer !== 'undefined' },
+                { name: 'TaskManager', obj: typeof TaskManager !== 'undefined' && Array.isArray(TaskManager.tasks) },
+                { name: 'QuickLinks', obj: typeof QuickLinks !== 'undefined' && Array.isArray(QuickLinks.links) }
+            ];
+
+            components.forEach(comp => {
+                const className = comp.obj ? 'pass' : 'fail';
+                const status = comp.obj ? '✓ Initialized' : '✗ Not initialized';
+                html += `<div class="test-result ${className}">${comp.name}: ${status}</div>`;
+            });
+
+            results.innerHTML = html;
+        }
+
+        // Test 4: Storage warning display
+        function testStorageWarning() {
+            const results = document.getElementById('test4-results');
+            
+            // Remove any existing warnings first
+            const existing = document.querySelector('.storage-warning');
+            if (existing) {
+                existing.remove();
+            }
+
+            // Call the warning display method
+            App.displayStorageWarning();
+
+            // Check if warning was added
+            const warning = document.querySelector('.storage-warning');
+            const success = warning !== null;
+
+            results.innerHTML = `
+                <div class="test-result ${success ? 'pass' : 'fail'}">
+                    ${success ? '✓ PASS' : '✗ FAIL'}: Warning element ${success ? 'created' : 'not created'}
+                </div>
+                ${success ? '<div class="test-result info">Check the top of the page for the warning banner</div>' : ''}
+            `;
+        }
+
+        // Run Test 1 automatically on load
+        window.addEventListener('DOMContentLoaded', () => {
+            test1();
+            
+            // Wait a bit for components to initialize
+            setTimeout(() => {
+                testComponentInit();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 10.2 - Functional Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .test-header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .test-results {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid #2196f3;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>Task 10.2: Greeting Widget Styling - Functional Test</h1>
+        <p>Automated verification of styling implementation</p>
+    </div>
+
+    <div class="test-results">
+        <div class="instructions">
+            <h3>📋 Test Instructions</h3>
+            <ol>
+                <li>Open browser console (F12) to see detailed test results</li>
+                <li>Verify the greeting widget below has proper styling</li>
+                <li>Check that all automated tests pass</li>
+                <li>Visual inspection: time is large, date is medium, greeting is emphasized</li>
+            </ol>
+        </div>
+
+        <h2>Greeting Widget Display</h2>
+        <section class="greeting-widget" aria-label="Greeting and time display">
+            <div class="time-display">10:45:32 AM</div>
+            <div class="date-display">Monday, January 15, 2024</div>
+            <div class="greeting-message">Good Morning</div>
+        </section>
+
+        <h2 style="margin-top: 2rem;">Automated Test Results</h2>
+        <div id="console-output" class="console-output">
+            Running tests...
+        </div>
+    </div>
+
+    <script>
+        // Capture console output
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.join(' ');
+            consoleOutput.textContent += message + '\n';
+        };
+    </script>
+    <script src="verify-task-10.2.js"></script>
+</body>
+</html>

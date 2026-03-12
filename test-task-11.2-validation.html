@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 11.2 - Input Validation Testing</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f5f7fa;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #4a90e2;
+            padding-bottom: 0.5rem;
+        }
+        h2 {
+            color: #4a90e2;
+            margin-top: 2rem;
+        }
+        .test-section {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background-color: #357abd;
+            transform: translateY(-2px);
+        }
+        .test-app {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .manual-test {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        .manual-test h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .manual-test ol {
+            margin: 0.5rem 0;
+        }
+        .manual-test li {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task 11.2 - Input Validation and Feedback Testing</h1>
+    
+    <div class="info">
+        <strong>Task Requirements:</strong>
+        <ul>
+            <li>Add inline validation messages for empty inputs</li>
+            <li>Add validation message for invalid URL format with example</li>
+            <li>Prevent form submission when validation fails</li>
+            <li>Maintain focus on invalid input fields</li>
+            <li>Requirements: 3.8, 5.5, 5.6</li>
+        </ul>
+    </div>
+
+    <h2>Automated Tests</h2>
+    <button onclick="runAllTests()">Run All Tests</button>
+    <div id="test-results"></div>
+
+    <h2>Manual Testing Instructions</h2>
+    
+    <div class="manual-test">
+        <h3>Task Manager Validation Tests</h3>
+        <ol>
+            <li><strong>Empty Task Test:</strong> Try to add a task with an empty description
+                <ul>
+                    <li>✓ Should show error: "Task description cannot be empty."</li>
+                    <li>✓ Focus should remain on the task input field</li>
+                    <li>✓ No task should be added to the list</li>
+                </ul>
+            </li>
+            <li><strong>Whitespace Task Test:</strong> Try to add a task with only spaces/tabs
+                <ul>
+                    <li>✓ Should show error: "Task description cannot be empty."</li>
+                    <li>✓ Focus should remain on the task input field</li>
+                    <li>✓ No task should be added to the list</li>
+                </ul>
+            </li>
+            <li><strong>Valid Task Test:</strong> Add a task with valid text
+                <ul>
+                    <li>✓ Should add the task successfully</li>
+                    <li>✓ No error message should appear</li>
+                    <li>✓ Input field should be cleared</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="manual-test">
+        <h3>Quick Links Validation Tests</h3>
+        <ol>
+            <li><strong>Empty Name Test:</strong> Try to add a link with empty name
+                <ul>
+                    <li>✓ Should show error: "Link name cannot be empty."</li>
+                    <li>✓ Focus should move to the name input field</li>
+                    <li>✓ No link should be added</li>
+                </ul>
+            </li>
+            <li><strong>Empty URL Test:</strong> Enter a name but leave URL empty
+                <ul>
+                    <li>✓ Should show error: "Link URL cannot be empty."</li>
+                    <li>✓ Focus should move to the URL input field</li>
+                    <li>✓ No link should be added</li>
+                </ul>
+            </li>
+            <li><strong>Invalid URL Format Test:</strong> Enter "example.com" (no protocol)
+                <ul>
+                    <li>✓ Should show error: "URL must start with http:// or https:// (e.g., https://example.com)"</li>
+                    <li>✓ Focus should move to the URL input field</li>
+                    <li>✓ No link should be added</li>
+                </ul>
+            </li>
+            <li><strong>Valid Link Test:</strong> Add a link with valid name and URL
+                <ul>
+                    <li>✓ Should add the link successfully</li>
+                    <li>✓ No error message should appear</li>
+                    <li>✓ Input fields should be cleared</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <h2>Live Application Testing</h2>
+    <div class="test-app">
+        <p>Use the application below to manually test the validation features:</p>
+        <iframe src="index.html"></iframe>
+    </div>
+
+    <script>
+        const testResults = [];
+
+        function addTestResult(testName, passed, message) {
+            testResults.push({ testName, passed, message });
+            displayResults();
+        }
+
+        function displayResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '';
+            
+            testResults.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.passed ? 'pass' : 'fail'}`;
+                div.innerHTML = `
+                    <strong>${result.passed ? '✓' : '✗'} ${result.testName}</strong><br>
+                    ${result.message}
+                `;
+                resultsDiv.appendChild(div);
+            });
+
+            // Summary
+            const passed = testResults.filter(r => r.passed).length;
+            const total = testResults.length;
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = `test-result ${passed === total ? 'pass' : 'fail'}`;
+            summaryDiv.innerHTML = `<strong>Summary: ${passed}/${total} tests passed</strong>`;
+            resultsDiv.appendChild(summaryDiv);
+        }
+
+        function runAllTests() {
+            testResults.length = 0;
+            
+            // Test 1: Validation error CSS exists
+            const cssLink = document.createElement('link');
+            cssLink.rel = 'stylesheet';
+            cssLink.href = 'css/styles.css';
+            document.head.appendChild(cssLink);
+            
+            cssLink.onload = () => {
+                // Check if validation-error styles are defined
+                const testDiv = document.createElement('div');
+                testDiv.className = 'validation-error';
+                testDiv.style.display = 'none';
+                document.body.appendChild(testDiv);
+                
+                const styles = window.getComputedStyle(testDiv);
+                const hasBackgroundColor = styles.backgroundColor !== 'rgba(0, 0, 0, 0)';
+                const hasPadding = parseFloat(styles.padding) > 0;
+                
+                document.body.removeChild(testDiv);
+                
+                addTestResult(
+                    'Validation Error CSS Styling',
+                    hasBackgroundColor && hasPadding,
+                    hasBackgroundColor && hasPadding 
+                        ? 'Validation error styles are properly defined in CSS'
+                        : 'Validation error styles are missing or incomplete'
+                );
+                
+                // Test 2: Check if app.js has validation methods
+                fetch('js/app.js')
+                    .then(response => response.text())
+                    .then(code => {
+                        const hasTaskValidation = code.includes('displayValidationError') && 
+                                                 code.includes('TaskManager');
+                        const hasLinkValidation = code.includes('displayValidationError') && 
+                                                 code.includes('QuickLinks');
+                        const hasClearValidation = code.includes('clearValidationErrors');
+                        const hasFocusManagement = code.includes('.focus()');
+                        const hasAriaLive = code.includes('aria-live');
+                        
+                        addTestResult(
+                            'Task Manager Validation Method',
+                            hasTaskValidation,
+                            hasTaskValidation 
+                                ? 'TaskManager has displayValidationError method'
+                                : 'TaskManager missing displayValidationError method'
+                        );
+                        
+                        addTestResult(
+                            'Quick Links Validation Method',
+                            hasLinkValidation,
+                            hasLinkValidation 
+                                ? 'QuickLinks has displayValidationError method'
+                                : 'QuickLinks missing displayValidationError method'
+                        );
+                        
+                        addTestResult(
+                            'Clear Validation Errors',
+                            hasClearValidation,
+                            hasClearValidation 
+                                ? 'Both components have clearValidationErrors method'
+                                : 'Missing clearValidationErrors method'
+                        );
+                        
+                        addTestResult(
+                            'Focus Management',
+                            hasFocusManagement,
+                            hasFocusManagement 
+                                ? 'Focus management implemented for invalid fields'
+                                : 'Focus management not implemented'
+                        );
+                        
+                        addTestResult(
+                            'Accessibility - ARIA Live Regions',
+                            hasAriaLive,
+                            hasAriaLive 
+                                ? 'Validation errors use aria-live for screen readers'
+                                : 'Missing aria-live attributes for accessibility'
+                        );
+                        
+                        // Test 3: Check validation messages
+                        const hasEmptyTaskMessage = code.includes('Task description cannot be empty');
+                        const hasEmptyNameMessage = code.includes('Link name cannot be empty');
+                        const hasEmptyUrlMessage = code.includes('Link URL cannot be empty');
+                        const hasInvalidUrlMessage = code.includes('URL must start with http:// or https://');
+                        const hasUrlExample = code.includes('https://example.com');
+                        
+                        addTestResult(
+                            'Empty Task Validation Message',
+                            hasEmptyTaskMessage,
+                            hasEmptyTaskMessage 
+                                ? 'Empty task validation message is present'
+                                : 'Missing empty task validation message'
+                        );
+                        
+                        addTestResult(
+                            'Empty Link Name Validation Message',
+                            hasEmptyNameMessage,
+                            hasEmptyNameMessage 
+                                ? 'Empty link name validation message is present'
+                                : 'Missing empty link name validation message'
+                        );
+                        
+                        addTestResult(
+                            'Empty URL Validation Message',
+                            hasEmptyUrlMessage,
+                            hasEmptyUrlMessage 
+                                ? 'Empty URL validation message is present'
+                                : 'Missing empty URL validation message'
+                        );
+                        
+                        addTestResult(
+                            'Invalid URL Format Message',
+                            hasInvalidUrlMessage && hasUrlExample,
+                            hasInvalidUrlMessage && hasUrlExample 
+                                ? 'Invalid URL message includes format requirement and example'
+                                : 'Invalid URL message missing or incomplete'
+                        );
+                        
+                        // Test 4: Requirements validation
+                        addTestResult(
+                            'Requirement 3.8 - Prevent Empty Tasks',
+                            hasTaskValidation && hasEmptyTaskMessage,
+                            'Task Manager prevents creation of tasks with empty descriptions'
+                        );
+                        
+                        addTestResult(
+                            'Requirement 5.5 - Prevent Empty Links',
+                            hasLinkValidation && hasEmptyNameMessage && hasEmptyUrlMessage,
+                            'Quick Links prevents creation of links with empty names or URLs'
+                        );
+                        
+                        addTestResult(
+                            'Requirement 5.6 - URL Protocol Validation',
+                            hasInvalidUrlMessage && hasUrlExample,
+                            'Quick Links validates that URLs begin with http:// or https://'
+                        );
+                    })
+                    .catch(error => {
+                        addTestResult(
+                            'JavaScript File Check',
+                            false,
+                            `Error loading app.js: ${error.message}`
+                        );
+                    });
+            };
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>

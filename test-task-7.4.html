@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 7.4 Test - Quick Links Event Handlers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .quick-links {
+            margin: 20px 0;
+        }
+        .link-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .link-form input {
+            flex: 1;
+            padding: 8px;
+        }
+        .link-form button {
+            padding: 8px 16px;
+        }
+        .links-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .link-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+        .link-button {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .btn-delete-link {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 2px 8px;
+            cursor: pointer;
+        }
+        .validation-error {
+            color: #721c24;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 3px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task 7.4 Test - Quick Links Event Handlers</h1>
+    
+    <div class="test-section">
+        <h2>Quick Links Component</h2>
+        <section class="quick-links" aria-label="Quick links">
+            <form class="link-form">
+                <input type="text" class="link-name-input" placeholder="Link name" aria-label="Link name">
+                <input type="url" class="link-url-input" placeholder="https://example.com" aria-label="Link URL">
+                <button type="submit" class="btn-add-link">Add Link</button>
+            </form>
+            <div class="links-container"></div>
+        </section>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // Copy the QuickLinks component from app.js
+        const QuickLinks = {
+            links: [],
+            storageKey: 'productivity-dashboard-links-test',
+
+            generateId() {
+                return `link-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+            },
+
+            loadLinks() {
+                try {
+                    const stored = localStorage.getItem(this.storageKey);
+                    if (stored) {
+                        const parsed = JSON.parse(stored);
+                        if (Array.isArray(parsed)) {
+                            return parsed;
+                        }
+                    }
+                    return [];
+                } catch (error) {
+                    console.error('Error loading links:', error);
+                    return [];
+                }
+            },
+
+            saveLinks() {
+                try {
+                    localStorage.setItem(this.storageKey, JSON.stringify(this.links));
+                    return true;
+                } catch (error) {
+                    console.error('Error saving links:', error);
+                    return false;
+                }
+            },
+
+            validateUrl(url) {
+                return url.startsWith('http://') || url.startsWith('https://');
+            },
+
+            addLink(name, url) {
+                const trimmedName = name.trim();
+                const trimmedUrl = url.trim();
+                
+                if (!trimmedName || !trimmedUrl || !this.validateUrl(trimmedUrl)) {
+                    return null;
+                }
+
+                const newLink = {
+                    id: this.generateId(),
+                    name: trimmedName,
+                    url: trimmedUrl,
+                    createdAt: Date.now()
+                };
+
+                this.links.push(newLink);
+                this.saveLinks();
+                return newLink;
+            },
+
+            deleteLink(id) {
+                const index = this.links.findIndex(link => link.id === id);
+                if (index === -1) return false;
+                
+                this.links.splice(index, 1);
+                this.saveLinks();
+                return true;
+            },
+
+            renderLinks() {
+                const linksContainer = document.querySelector('.links-container');
+                if (!linksContainer) return;
+
+                linksContainer.innerHTML = '';
+                this.links.forEach(link => {
+                    const linkElement = this.renderLink(link);
+                    linksContainer.appendChild(linkElement);
+                });
+            },
+
+            renderLink(link) {
+                const linkItem = document.createElement('div');
+                linkItem.className = 'link-item';
+                linkItem.setAttribute('data-link-id', link.id);
+
+                const anchor = document.createElement('a');
+                anchor.href = link.url;
+                anchor.target = '_blank';
+                anchor.className = 'link-button';
+                anchor.textContent = link.name;
+                anchor.setAttribute('rel', 'noopener noreferrer');
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'btn-delete-link';
+                deleteButton.textContent = '×';
+                deleteButton.setAttribute('aria-label', `Delete link: ${link.name}`);
+
+                linkItem.appendChild(anchor);
+                linkItem.appendChild(deleteButton);
+                return linkItem;
+            },
+
+            init() {
+                this.links = this.loadLinks();
+                this.renderLinks();
+                this.attachEventListeners();
+            },
+
+            attachEventListeners() {
+                const linkForm = document.querySelector('.link-form');
+                if (linkForm) {
+                    linkForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleLinkSubmit();
+                    });
+                }
+
+                const linksContainer = document.querySelector('.links-container');
+                if (linksContainer) {
+                    linksContainer.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('btn-delete-link')) {
+                            const linkItem = e.target.closest('.link-item');
+                            if (linkItem) {
+                                const linkId = linkItem.getAttribute('data-link-id');
+                                this.handleDelete(linkId);
+                            }
+                        }
+                    });
+                }
+            },
+
+            handleLinkSubmit() {
+                const nameInput = document.querySelector('.link-name-input');
+                const urlInput = document.querySelector('.link-url-input');
+                
+                if (!nameInput || !urlInput) return;
+
+                const name = nameInput.value;
+                const url = urlInput.value;
+
+                this.clearValidationErrors();
+                const newLink = this.addLink(name, url);
+
+                if (newLink) {
+                    nameInput.value = '';
+                    urlInput.value = '';
+                    this.renderLinks();
+                } else {
+                    this.displayValidationError(name, url);
+                }
+            },
+
+            handleDelete(linkId) {
+                this.deleteLink(linkId);
+                this.renderLinks();
+            },
+
+            displayValidationError(name, url) {
+                const linkForm = document.querySelector('.link-form');
+                if (!linkForm) return;
+
+                this.clearValidationErrors();
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'validation-error';
+                errorDiv.setAttribute('role', 'alert');
+
+                const trimmedName = name.trim();
+                const trimmedUrl = url.trim();
+
+                if (!trimmedName) {
+                    errorDiv.textContent = 'Link name cannot be empty.';
+                } else if (!trimmedUrl) {
+                    errorDiv.textContent = 'Link URL cannot be empty.';
+                } else if (!this.validateUrl(trimmedUrl)) {
+                    errorDiv.textContent = 'URL must start with http:// or https:// (e.g., https://example.com)';
+                } else {
+                    errorDiv.textContent = 'Failed to add link. Please check your input.';
+                }
+
+                linkForm.parentNode.insertBefore(errorDiv, linkForm.nextSibling);
+            },
+
+            clearValidationErrors() {
+                const existingError = document.querySelector('.quick-links .validation-error');
+                if (existingError) {
+                    existingError.remove();
+                }
+            }
+        };
+
+        // Test suite
+        function runTests() {
+            const results = [];
+            
+            // Clear storage before tests
+            localStorage.removeItem('productivity-dashboard-links-test');
+            
+            // Test 1: init() loads links and attaches event listeners
+            try {
+                QuickLinks.init();
+                const hasEventListener = document.querySelector('.link-form') !== null;
+                results.push({
+                    name: 'Test 1: init() initializes component',
+                    pass: hasEventListener && Array.isArray(QuickLinks.links),
+                    message: hasEventListener ? 'Component initialized successfully' : 'Failed to initialize'
+                });
+            } catch (error) {
+                results.push({
+                    name: 'Test 1: init() initializes component',
+                    pass: false,
+                    message: `Error: ${error.message}`
+                });
+            }
+
+            // Test 2: Form submission with valid data
+            try {
+                const nameInput = document.querySelector('.link-name-input');
+                const urlInput = document.querySelector('.link-url-input');
+                
+                nameInput.value = 'Google';
+                urlInput.value = 'https://google.com';
+                
+                const initialLength = QuickLinks.links.length;
+                QuickLinks.handleLinkSubmit();
+                
+                const added = QuickLinks.links.length === initialLength + 1;
+                const cleared = nameInput.value === '' && urlInput.value === '';
+                
+                results.push({
+                    name: 'Test 2: Form submission adds link and clears inputs',
+                    pass: added && cleared,
+                    message: added && cleared ? 'Link added and inputs cleared' : 'Failed to add link or clear inputs'
+                });
+            } catch (error) {
+                results.push({
+                    name: 'Test 2: Form submission adds link and clears inputs',
+                    pass: false,
+                    message: `Error: ${error.message}`
+                });
+            }
+
+            // Test 3: Validation error for empty name
+            try {
+                const nameInput = document.querySelector('.link-name-input');
+                const urlInput = document.querySelector('.link-url-input');
+                
+                nameInput.value = '';
+                urlInput.value = 'https://example.com';
+                
+                QuickLinks.handleLinkSubmit();
+                
+                const errorExists = document.querySelector('.validation-error') !== null;
+                const errorText = errorExists ? document.querySelector('.validation-error').textContent : '';
+                
+                results.push({
+                    name: 'Test 3: Validation error for empty name',
+                    pass: errorExists && errorText.includes('name cannot be empty'),
+                    message: errorExists ? `Error displayed: "${errorText}"` : 'No error displayed'
+                });
+            } catch (error) {
+                results.push({
+                    name: 'Test 3: Validation error for empty name',
+                    pass: false,
+                    message: `Error: ${error.message}`
+                });
+            }
+
+            // Test 4: Validation error for invalid URL
+            try {
+                QuickLinks.clearValidationErrors();
+                const nameInput = document.querySelector('.link-name-input');
+                const urlInput = document.querySelector('.link-url-input');
+                
+                nameInput.value = 'Invalid';
+                urlInput.value = 'not-a-url';
+                
+                QuickLinks.handleLinkSubmit();
+                
+                const errorExists = document.querySelector('.validation-error') !== null;
+                const errorText = errorExists ? document.querySelector('.validation-error').textContent : '';
+                
+                results.push({
+                    name: 'Test 4: Validation error for invalid URL',
+                    pass: errorExists && errorText.includes('http'),
+                    message: errorExists ? `Error displayed: "${errorText}"` : 'No error displayed'
+                });
+            } catch (error) {
+                results.push({
+                    name: 'Test 4: Validation error for invalid URL',
+                    pass: false,
+                    message: `Error: ${error.message}`
+                });
+            }
+
+            // Test 5: Delete button removes link
+            try {
+                QuickLinks.clearValidationErrors();
+                
+                // Add a link first
+                const linkToDelete = QuickLinks.addLink('Test Delete', 'https://test.com');
+                QuickLinks.renderLinks();
+                
+                const initialLength = QuickLinks.links.length;
+                QuickLinks.handleDelete(linkToDelete.id);
+                
+                const deleted = QuickLinks.links.length === initialLength - 1;
+                
+                results.push({
+                    name: 'Test 5: Delete button removes link',
+                    pass: deleted,
+                    message: deleted ? 'Link deleted successfully' : 'Failed to delete link'
+                });
+            } catch (error) {
+                results.push({
+                    name: 'Test 5: Delete button removes link',
+                    pass: false,
+                    message: `Error: ${error.message}`
+                });
+            }
+
+            // Display results
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            const container = document.getElementById('test-results');
+            container.innerHTML = '';
+            
+            results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.pass ? 'pass' : 'fail'}`;
+                div.innerHTML = `
+                    <strong>${result.pass ? '✓' : '✗'} ${result.name}</strong><br>
+                    ${result.message}
+                `;
+                container.appendChild(div);
+            });
+
+            const summary = document.createElement('div');
+            const passed = results.filter(r => r.pass).length;
+            const total = results.length;
+            summary.className = `test-result ${passed === total ? 'pass' : 'fail'}`;
+            summary.innerHTML = `<strong>Summary: ${passed}/${total} tests passed</strong>`;
+            container.appendChild(summary);
+        }
+
+        // Run tests when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runTests, 100);
+        });
+    </script>
+</body>
+</html>

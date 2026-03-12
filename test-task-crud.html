@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task CRUD Test</title>
+</head>
+<body>
+    <h1>Task CRUD Operations Test</h1>
+    <div id="test-results"></div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Test suite for Task CRUD operations
+        const results = [];
+        
+        function log(message, passed = true) {
+            results.push({ message, passed });
+            console.log(`${passed ? '✓' : '✗'} ${message}`);
+        }
+
+        function runTests() {
+            // Clear any existing tasks
+            TaskManager.tasks = [];
+            localStorage.removeItem('productivity-dashboard-tasks');
+
+            // Test 1: addTask with valid description
+            log('Test 1: addTask with valid description');
+            const task1 = TaskManager.addTask('Test task 1');
+            if (task1 && task1.description === 'Test task 1' && task1.completed === false) {
+                log('  - Task created with correct properties', true);
+            } else {
+                log('  - Task creation failed', false);
+            }
+            if (TaskManager.tasks.length === 1) {
+                log('  - Task added to array', true);
+            } else {
+                log('  - Task not added to array', false);
+            }
+
+            // Test 2: addTask with whitespace
+            log('Test 2: addTask trims whitespace');
+            const task2 = TaskManager.addTask('  Test task 2  ');
+            if (task2 && task2.description === 'Test task 2') {
+                log('  - Whitespace trimmed correctly', true);
+            } else {
+                log('  - Whitespace not trimmed', false);
+            }
+
+            // Test 3: addTask with empty string
+            log('Test 3: addTask rejects empty string');
+            const task3 = TaskManager.addTask('');
+            if (task3 === null && TaskManager.tasks.length === 2) {
+                log('  - Empty string rejected', true);
+            } else {
+                log('  - Empty string not rejected', false);
+            }
+
+            // Test 4: addTask with whitespace-only string
+            log('Test 4: addTask rejects whitespace-only string');
+            const task4 = TaskManager.addTask('   ');
+            if (task4 === null && TaskManager.tasks.length === 2) {
+                log('  - Whitespace-only string rejected', true);
+            } else {
+                log('  - Whitespace-only string not rejected', false);
+            }
+
+            // Test 5: toggleComplete
+            log('Test 5: toggleComplete flips status');
+            const taskId = TaskManager.tasks[0].id;
+            const initialStatus = TaskManager.tasks[0].completed;
+            TaskManager.toggleComplete(taskId);
+            if (TaskManager.tasks[0].completed === !initialStatus) {
+                log('  - Status toggled correctly', true);
+            } else {
+                log('  - Status not toggled', false);
+            }
+
+            // Test 6: toggleComplete twice (idempotence)
+            log('Test 6: toggleComplete twice returns to original');
+            TaskManager.toggleComplete(taskId);
+            if (TaskManager.tasks[0].completed === initialStatus) {
+                log('  - Double toggle returns to original', true);
+            } else {
+                log('  - Double toggle failed', false);
+            }
+
+            // Test 7: updateTask
+            log('Test 7: updateTask modifies properties');
+            TaskManager.updateTask(taskId, { description: 'Updated task' });
+            if (TaskManager.tasks[0].description === 'Updated task') {
+                log('  - Task description updated', true);
+            } else {
+                log('  - Task description not updated', false);
+            }
+
+            // Test 8: deleteTask
+            log('Test 8: deleteTask removes task');
+            const lengthBefore = TaskManager.tasks.length;
+            TaskManager.deleteTask(taskId);
+            if (TaskManager.tasks.length === lengthBefore - 1) {
+                log('  - Task removed from array', true);
+            } else {
+                log('  - Task not removed', false);
+            }
+            if (!TaskManager.tasks.find(t => t.id === taskId)) {
+                log('  - Task no longer in array', true);
+            } else {
+                log('  - Task still in array', false);
+            }
+
+            // Test 9: saveTasks and loadTasks (persistence)
+            log('Test 9: saveTasks and loadTasks work correctly');
+            TaskManager.tasks = [];
+            TaskManager.addTask('Persistent task 1');
+            TaskManager.addTask('Persistent task 2');
+            const savedTasks = [...TaskManager.tasks];
+            
+            // Load tasks
+            TaskManager.tasks = [];
+            TaskManager.tasks = TaskManager.loadTasks();
+            
+            if (TaskManager.tasks.length === 2) {
+                log('  - Correct number of tasks loaded', true);
+            } else {
+                log('  - Wrong number of tasks loaded', false);
+            }
+            if (TaskManager.tasks[0].description === 'Persistent task 1' &&
+                TaskManager.tasks[1].description === 'Persistent task 2') {
+                log('  - Task descriptions preserved', true);
+            } else {
+                log('  - Task descriptions not preserved', false);
+            }
+
+            // Test 10: Operations call saveTasks
+            log('Test 10: Operations persist to storage');
+            TaskManager.tasks = [];
+            TaskManager.addTask('Storage test');
+            const stored = JSON.parse(localStorage.getItem('productivity-dashboard-tasks'));
+            if (stored && stored.length === 1 && stored[0].description === 'Storage test') {
+                log('  - addTask persists to storage', true);
+            } else {
+                log('  - addTask does not persist', false);
+            }
+
+            // Display results
+            const resultsDiv = document.getElementById('test-results');
+            const passed = results.filter(r => r.passed).length;
+            const total = results.length;
+            
+            resultsDiv.innerHTML = `
+                <h2>Test Results: ${passed}/${total} passed</h2>
+                <ul>
+                    ${results.map(r => `<li style="color: ${r.passed ? 'green' : 'red'}">${r.message}</li>`).join('')}
+                </ul>
+            `;
+
+            // Clean up
+            localStorage.removeItem('productivity-dashboard-tasks');
+        }
+
+        // Run tests after a short delay to ensure app.js is loaded
+        setTimeout(runTests, 100);
+    </script>
+</body>
+</html>

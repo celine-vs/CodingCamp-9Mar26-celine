@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functional Test - Task 11.3 Timer Edge Cases</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .test-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .test-panel h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .test-instructions {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        button.test-btn {
+            margin: 5px 0;
+            padding: 6px 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button.test-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-panel">
+        <h3>Task 11.3 Edge Cases Test</h3>
+        
+        <div class="test-instructions">
+            <strong>Manual Test Instructions:</strong>
+            <ol style="margin: 5px 0; padding-left: 20px; font-size: 13px;">
+                <li>Check initial button states</li>
+                <li>Click Start - verify button states change</li>
+                <li>Try clicking Start again - should do nothing</li>
+                <li>Click Stop - verify button states change</li>
+                <li>Click Reset - verify button states</li>
+                <li>Let timer run to completion</li>
+            </ol>
+        </div>
+
+        <div id="test-results"></div>
+        
+        <button class="test-btn" onclick="runAutomatedTests()">Run Automated Tests</button>
+        <button class="test-btn" onclick="resetTests()">Reset Tests</button>
+    </div>
+
+    <main class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>Productivity Dashboard - Timer Edge Cases Test</h1>
+        </header>
+
+        <section class="focus-timer" aria-label="Focus timer">
+            <h2>Focus Timer</h2>
+            <div class="timer-display">25:00</div>
+            <div class="timer-controls">
+                <button class="btn-start" aria-label="Start timer">Start</button>
+                <button class="btn-stop" aria-label="Stop timer">Stop</button>
+                <button class="btn-reset" aria-label="Reset timer">Reset</button>
+            </div>
+            <div class="timer-status"></div>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        let testResults = [];
+
+        function addTestResult(name, passed, message) {
+            testResults.push({ name, passed, message });
+            displayResults();
+        }
+
+        function displayResults() {
+            const container = document.getElementById('test-results');
+            container.innerHTML = testResults.map(result => `
+                <div class="test-item">
+                    <strong>${result.name}</strong>
+                    <span class="status ${result.passed ? 'pass' : 'fail'}">
+                        ${result.passed ? '✓ PASS' : '✗ FAIL'}
+                    </span>
+                    <div style="font-size: 12px; margin-top: 4px;">${result.message}</div>
+                </div>
+            `).join('');
+        }
+
+        function resetTests() {
+            testResults = [];
+            displayResults();
+            FocusTimer.reset();
+        }
+
+        function runAutomatedTests() {
+            testResults = [];
+            
+            // Test 1: Initial button states
+            const startBtn = document.querySelector('.btn-start');
+            const stopBtn = document.querySelector('.btn-stop');
+            
+            FocusTimer.reset();
+            
+            setTimeout(() => {
+                const test1Pass = !startBtn.disabled && stopBtn.disabled;
+                addTestResult('Test 1: Initial States', test1Pass, 
+                    `Start: ${startBtn.disabled ? 'disabled' : 'enabled'}, Stop: ${stopBtn.disabled ? 'disabled' : 'enabled'}`);
+                
+                // Test 2: Button states after start
+                FocusTimer.start();
+                
+                setTimeout(() => {
+                    const test2Pass = startBtn.disabled && !stopBtn.disabled;
+                    addTestResult('Test 2: After Start', test2Pass, 
+                        `Start: ${startBtn.disabled ? 'disabled' : 'enabled'}, Stop: ${stopBtn.disabled ? 'disabled' : 'enabled'}`);
+                    
+                    // Test 3: Prevent multiple intervals
+                    const intervalId1 = FocusTimer.state.intervalId;
+                    FocusTimer.start();
+                    FocusTimer.start();
+                    const intervalId2 = FocusTimer.state.intervalId;
+                    
+                    const test3Pass = intervalId1 === intervalId2;
+                    addTestResult('Test 3: Prevent Multiple Intervals', test3Pass, 
+                        `Interval ID unchanged: ${intervalId1 === intervalId2}`);
+                    
+                    // Test 4: Button states after stop
+                    FocusTimer.stop();
+                    
+                    setTimeout(() => {
+                        const test4Pass = !startBtn.disabled && stopBtn.disabled;
+                        addTestResult('Test 4: After Stop', test4Pass, 
+                            `Start: ${startBtn.disabled ? 'disabled' : 'enabled'}, Stop: ${stopBtn.disabled ? 'disabled' : 'enabled'}`);
+                        
+                        // Test 5: Button states after reset
+                        FocusTimer.start();
+                        FocusTimer.reset();
+                        
+                        setTimeout(() => {
+                            const test5Pass = !startBtn.disabled && stopBtn.disabled && FocusTimer.state.remaining === 1500;
+                            addTestResult('Test 5: After Reset', test5Pass, 
+                                `Start: ${startBtn.disabled ? 'disabled' : 'enabled'}, Stop: ${stopBtn.disabled ? 'disabled' : 'enabled'}, Time: ${FocusTimer.state.remaining}s`);
+                            
+                            // Test 6: Timer stops at zero
+                            FocusTimer.state.remaining = 2;
+                            FocusTimer.start();
+                            
+                            setTimeout(() => {
+                                const test6Pass = FocusTimer.state.remaining === 0 && !FocusTimer.state.isRunning;
+                                addTestResult('Test 6: Stops at Zero', test6Pass, 
+                                    `Remaining: ${FocusTimer.state.remaining}s, Running: ${FocusTimer.state.isRunning}`);
+                                
+                                // Test 7: Button states at completion
+                                setTimeout(() => {
+                                    const test7Pass = startBtn.disabled && stopBtn.disabled;
+                                    addTestResult('Test 7: Completion States', test7Pass, 
+                                        `Start: ${startBtn.disabled ? 'disabled' : 'enabled'}, Stop: ${stopBtn.disabled ? 'disabled' : 'enabled'}`);
+                                }, 100);
+                            }, 2500);
+                        }, 100);
+                    }, 100);
+                }, 100);
+            }, 100);
+        }
+
+        // Monitor button state changes
+        const startBtn = document.querySelector('.btn-start');
+        const stopBtn = document.querySelector('.btn-stop');
+        
+        const observer = new MutationObserver(() => {
+            console.log('Button states:', {
+                start: startBtn.disabled ? 'disabled' : 'enabled',
+                stop: stopBtn.disabled ? 'disabled' : 'enabled',
+                timerRunning: FocusTimer.state.isRunning,
+                remaining: FocusTimer.state.remaining
+            });
+        });
+        
+        observer.observe(startBtn, { attributes: true, attributeFilter: ['disabled'] });
+        observer.observe(stopBtn, { attributes: true, attributeFilter: ['disabled'] });
+    </script>
+</body>
+</html>

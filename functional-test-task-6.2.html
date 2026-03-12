@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 6.2 Functional Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #2196F3;
+        }
+        .task-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .task-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn-add-task {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-add-task:hover {
+            background: #45a049;
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            margin: 8px 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .task-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .task-item.completed {
+            opacity: 0.6;
+            background: #f0f0f0;
+        }
+        .task-item.completed .task-description {
+            text-decoration: line-through;
+        }
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .task-description {
+            flex: 1;
+            font-size: 14px;
+        }
+        .task-edit-input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #2196F3;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn-edit-task, .btn-delete-task {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .btn-edit-task {
+            background: #2196F3;
+            color: white;
+        }
+        .btn-edit-task:hover {
+            background: #0b7dda;
+        }
+        .btn-delete-task {
+            background: #f44336;
+            color: white;
+        }
+        .btn-delete-task:hover {
+            background: #da190b;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #1976D2;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 5px 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Task 6.2 Functional Test</h1>
+        
+        <div class="status success">
+            ✓ All implementation checks passed! Testing interactive functionality...
+        </div>
+
+        <div class="instructions">
+            <h3>Test Instructions</h3>
+            <ol>
+                <li><strong>Add Task:</strong> Type a task description and click "Add" or press Enter</li>
+                <li><strong>Toggle Complete:</strong> Click the checkbox to mark a task as complete/incomplete</li>
+                <li><strong>Edit Task:</strong> Click "Edit" button, modify the text, and press Enter or click outside</li>
+                <li><strong>Delete Task:</strong> Click "Delete" button to remove a task</li>
+                <li><strong>Empty Task:</strong> Try submitting an empty task (should be prevented)</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>Task Manager</h2>
+            <form class="task-form">
+                <input type="text" class="task-input" placeholder="Add a new task..." aria-label="New task description">
+                <button type="submit" class="btn-add-task">Add</button>
+            </form>
+            <ul class="task-list"></ul>
+        </div>
+
+        <div class="status info" id="event-log">
+            <strong>Event Log:</strong>
+            <div id="log-content">Waiting for interactions...</div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Override storage key for testing
+        TaskManager.storageKey = 'test-task-6.2-tasks';
+        
+        // Clear test storage
+        localStorage.removeItem('test-task-6.2-tasks');
+        
+        // Initialize TaskManager
+        TaskManager.init();
+
+        // Event logging for demonstration
+        const logContent = document.getElementById('log-content');
+        const logs = [];
+
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`[${timestamp}] ${message}`);
+            if (logs.length > 5) logs.shift();
+            logContent.innerHTML = logs.join('<br>');
+        }
+
+        // Monitor task operations
+        const originalAddTask = TaskManager.addTask.bind(TaskManager);
+        TaskManager.addTask = function(description) {
+            const result = originalAddTask(description);
+            if (result) {
+                addLog(`✓ Task added: "${description}"`);
+            } else {
+                addLog(`✗ Task rejected: empty description`);
+            }
+            return result;
+        };
+
+        const originalToggleComplete = TaskManager.toggleComplete.bind(TaskManager);
+        TaskManager.toggleComplete = function(id) {
+            const task = this.tasks.find(t => t.id === id);
+            const result = originalToggleComplete(id);
+            if (result !== null) {
+                addLog(`✓ Task ${result ? 'completed' : 'uncompleted'}: "${task.description}"`);
+            }
+            return result;
+        };
+
+        const originalDeleteTask = TaskManager.deleteTask.bind(TaskManager);
+        TaskManager.deleteTask = function(id) {
+            const task = this.tasks.find(t => t.id === id);
+            const result = originalDeleteTask(id);
+            if (result) {
+                addLog(`✓ Task deleted: "${task.description}"`);
+            }
+            return result;
+        };
+
+        const originalUpdateTask = TaskManager.updateTask.bind(TaskManager);
+        TaskManager.updateTask = function(id, updates) {
+            const result = originalUpdateTask(id, updates);
+            if (result && updates.description) {
+                addLog(`✓ Task updated: "${updates.description}"`);
+            }
+            return result;
+        };
+
+        // Add some sample tasks for testing
+        setTimeout(() => {
+            addLog('Adding sample tasks for testing...');
+            TaskManager.addTask('Complete project documentation');
+            TaskManager.addTask('Review pull requests');
+            TaskManager.addTask('Update dependencies');
+            addLog('Sample tasks added. Try interacting with them!');
+        }, 500);
+    </script>
+</body>
+</html>

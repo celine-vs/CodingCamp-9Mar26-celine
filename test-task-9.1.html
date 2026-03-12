@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 9.1 Test - App Initialization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .pass { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Task 9.1 Test - App Initialization</h1>
+    <p>This test verifies that the App object initializes all components and checks Local Storage availability.</p>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const results = document.getElementById('test-results');
+            const tests = [];
+
+            // Test 1: App object exists
+            tests.push({
+                name: 'App object exists',
+                pass: typeof App !== 'undefined'
+            });
+
+            // Test 2: App.init method exists
+            tests.push({
+                name: 'App.init() method exists',
+                pass: typeof App.init === 'function'
+            });
+
+            // Test 3: App.isLocalStorageAvailable method exists
+            tests.push({
+                name: 'App.isLocalStorageAvailable() method exists',
+                pass: typeof App.isLocalStorageAvailable === 'function'
+            });
+
+            // Test 4: App.displayStorageWarning method exists
+            tests.push({
+                name: 'App.displayStorageWarning() method exists',
+                pass: typeof App.displayStorageWarning === 'function'
+            });
+
+            // Test 5: isLocalStorageAvailable returns boolean
+            tests.push({
+                name: 'isLocalStorageAvailable() returns boolean',
+                pass: typeof App.isLocalStorageAvailable() === 'boolean'
+            });
+
+            // Test 6: All components are initialized
+            tests.push({
+                name: 'GreetingWidget initialized',
+                pass: typeof GreetingWidget !== 'undefined' && document.querySelector('.time-display').textContent !== ''
+            });
+
+            tests.push({
+                name: 'FocusTimer initialized',
+                pass: typeof FocusTimer !== 'undefined' && document.querySelector('.timer-display').textContent !== ''
+            });
+
+            tests.push({
+                name: 'TaskManager initialized',
+                pass: typeof TaskManager !== 'undefined' && Array.isArray(TaskManager.tasks)
+            });
+
+            tests.push({
+                name: 'QuickLinks initialized',
+                pass: typeof QuickLinks !== 'undefined' && Array.isArray(QuickLinks.links)
+            });
+
+            // Display results
+            let html = '<ul>';
+            let passCount = 0;
+            tests.forEach(test => {
+                const status = test.pass ? '<span class="pass">✓ PASS</span>' : '<span class="fail">✗ FAIL</span>';
+                html += `<li>${status} - ${test.name}</li>`;
+                if (test.pass) passCount++;
+            });
+            html += '</ul>';
+            html += `<p class="info">Passed ${passCount} out of ${tests.length} tests</p>`;
+            
+            results.innerHTML = html;
+
+            // Additional info
+            const storageAvailable = App.isLocalStorageAvailable();
+            results.innerHTML += `<p class="info">Local Storage Available: ${storageAvailable ? 'Yes' : 'No'}</p>`;
+        });
+    </script>
+</body>
+</html>

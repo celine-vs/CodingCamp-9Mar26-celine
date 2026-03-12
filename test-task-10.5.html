@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 10.5 - Quick Links Styling Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .test-section {
+            margin: 2rem;
+            padding: 1.5rem;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .test-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        .requirement {
+            background: #e8f4f8;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-left: 4px solid #4a90e2;
+            border-radius: 4px;
+        }
+        .pass {
+            color: #50c878;
+            font-weight: bold;
+        }
+        .instructions {
+            background: #fff3cd;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Task 10.5 - Quick Links Styling Verification</h1>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Requirements to Validate:</div>
+            <div class="requirement">
+                <strong>7.4:</strong> The Dashboard SHALL use visual hierarchy to emphasize important elements
+            </div>
+            <div class="requirement">
+                <strong>7.5:</strong> The Dashboard SHALL provide clear visual feedback for interactive elements on hover
+            </div>
+            <div class="requirement">
+                <strong>7.6:</strong> The Dashboard SHALL provide clear visual feedback for interactive elements on click
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Manual Testing Instructions:</div>
+            <div class="instructions">
+                <p><strong>Test the following interactions:</strong></p>
+                <ol>
+                    <li><strong>Link Form Inputs:</strong> Hover over and click into the name and URL inputs - should show border color change and focus state</li>
+                    <li><strong>Add Link Button:</strong> Hover over the "Add Link" button - should lift up and show shadow</li>
+                    <li><strong>Add Link Button Click:</strong> Click the "Add Link" button - should show pressed state</li>
+                    <li><strong>Link Buttons:</strong> Hover over link cards - should change color, lift up, and scale slightly</li>
+                    <li><strong>Link Button Click:</strong> Click a link button - should show active state before navigation</li>
+                    <li><strong>Delete Buttons:</strong> Hover over delete buttons - should lift up with red shadow</li>
+                    <li><strong>Delete Button Click:</strong> Click a delete button - should show pressed state</li>
+                    <li><strong>Visual Hierarchy:</strong> Verify link buttons are visually distinct as cards/pills</li>
+                    <li><strong>Responsive Layout:</strong> Resize window to test form layout changes</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Quick Links Component -->
+        <section class="quick-links">
+            <h2>Quick Links</h2>
+            
+            <form class="link-form" id="linkForm">
+                <input 
+                    type="text" 
+                    class="link-name-input" 
+                    id="linkName" 
+                    placeholder="Link Name (e.g., Gmail)"
+                    required
+                >
+                <input 
+                    type="url" 
+                    class="link-url-input" 
+                    id="linkUrl" 
+                    placeholder="URL (e.g., https://gmail.com)"
+                    required
+                >
+                <button type="submit" class="btn-add-link">Add Link</button>
+            </form>
+
+            <div class="links-container" id="linksContainer">
+                <!-- Sample links for testing -->
+                <div class="link-item">
+                    <a href="https://github.com" class="link-button" target="_blank" rel="noopener noreferrer">
+                        GitHub
+                    </a>
+                    <button class="btn-delete-link" data-id="1">Delete</button>
+                </div>
+                <div class="link-item">
+                    <a href="https://gmail.com" class="link-button" target="_blank" rel="noopener noreferrer">
+                        Gmail
+                    </a>
+                    <button class="btn-delete-link" data-id="2">Delete</button>
+                </div>
+                <div class="link-item">
+                    <a href="https://stackoverflow.com" class="link-button" target="_blank" rel="noopener noreferrer">
+                        Stack Overflow
+                    </a>
+                    <button class="btn-delete-link" data-id="3">Delete</button>
+                </div>
+                <div class="link-item">
+                    <a href="https://developer.mozilla.org" class="link-button" target="_blank" rel="noopener noreferrer">
+                        MDN Web Docs
+                    </a>
+                    <button class="btn-delete-link" data-id="4">Delete</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="test-section">
+            <div class="test-title">Visual Verification Checklist:</div>
+            <div class="instructions">
+                <p><strong>Verify the following visual elements:</strong></p>
+                <ul>
+                    <li>✓ Link form inputs have clear borders and focus states</li>
+                    <li>✓ Add Link button is prominent with primary color</li>
+                    <li>✓ Link buttons are styled as cards/pills with rounded corners</li>
+                    <li>✓ Link buttons have clear hover effects (color change, lift, scale)</li>
+                    <li>✓ Link buttons have clear active/click effects</li>
+                    <li>✓ Delete buttons are red with clear danger affordance</li>
+                    <li>✓ Delete buttons have hover effects (lift, shadow)</li>
+                    <li>✓ Delete buttons have active/click effects</li>
+                    <li>✓ Grid layout displays links in a responsive manner</li>
+                    <li>✓ All interactive elements provide visual feedback</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple form handler for testing
+        document.getElementById('linkForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('linkName').value;
+            const url = document.getElementById('linkUrl').value;
+            
+            if (name && url) {
+                const container = document.getElementById('linksContainer');
+                const linkItem = document.createElement('div');
+                linkItem.className = 'link-item';
+                linkItem.innerHTML = `
+                    <a href="${url}" class="link-button" target="_blank" rel="noopener noreferrer">
+                        ${name}
+                    </a>
+                    <button class="btn-delete-link">Delete</button>
+                `;
+                container.appendChild(linkItem);
+                
+                // Clear form
+                document.getElementById('linkName').value = '';
+                document.getElementById('linkUrl').value = '';
+                
+                // Add delete handler
+                linkItem.querySelector('.btn-delete-link').addEventListener('click', function() {
+                    linkItem.remove();
+                });
+            }
+        });
+        
+        // Add delete handlers to existing buttons
+        document.querySelectorAll('.btn-delete-link').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.link-item').remove();
+            });
+        });
+    </script>
+</body>
+</html>

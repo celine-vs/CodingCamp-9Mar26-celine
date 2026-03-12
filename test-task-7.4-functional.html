@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 7.4 Functional Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .test-instructions {
+            background: #e7f3ff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .test-instructions h2 {
+            margin-top: 0;
+        }
+        .test-instructions ol {
+            margin: 10px 0;
+        }
+        .test-instructions li {
+            margin: 8px 0;
+        }
+        .checklist {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .checklist label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        .checklist input[type="checkbox"] {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <main class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>Task 7.4 Functional Test - Quick Links Event Handlers</h1>
+        </header>
+
+        <div class="test-instructions">
+            <h2>Test Instructions</h2>
+            <p>This test verifies that Task 7.4 requirements are met:</p>
+            <ol>
+                <li><strong>init() loads links and attaches event listeners</strong></li>
+                <li><strong>Submit handler with preventDefault</strong> - Form submission should not reload page</li>
+                <li><strong>Click handlers for delete buttons</strong> - Delete buttons should remove links</li>
+                <li><strong>Clear input fields after successful creation</strong> - Inputs should be empty after adding</li>
+                <li><strong>Display validation errors for invalid URLs</strong> - Show error messages for bad input</li>
+            </ol>
+
+            <h3>Manual Test Steps:</h3>
+            <ol>
+                <li>Add a valid link (e.g., "Google" and "https://google.com") - inputs should clear</li>
+                <li>Try to add a link with empty name - should show validation error</li>
+                <li>Try to add a link with empty URL - should show validation error</li>
+                <li>Try to add a link with invalid URL (e.g., "google.com" without http://) - should show error</li>
+                <li>Add multiple valid links - all should appear in the container</li>
+                <li>Click delete button on a link - link should be removed</li>
+                <li>Reload the page - links should persist from localStorage</li>
+            </ol>
+
+            <div class="checklist">
+                <h3>Verification Checklist:</h3>
+                <label><input type="checkbox"> init() loads existing links from storage</label>
+                <label><input type="checkbox"> Form submission doesn't reload page (preventDefault works)</label>
+                <label><input type="checkbox"> Valid link is added and displayed</label>
+                <label><input type="checkbox"> Input fields are cleared after successful add</label>
+                <label><input type="checkbox"> Empty name shows validation error</label>
+                <label><input type="checkbox"> Empty URL shows validation error</label>
+                <label><input type="checkbox"> Invalid URL format shows validation error with example</label>
+                <label><input type="checkbox"> Delete button removes link from display</label>
+                <label><input type="checkbox"> Delete button removes link from storage</label>
+                <label><input type="checkbox"> Links persist after page reload</label>
+            </div>
+        </div>
+
+        <section class="quick-links" aria-label="Quick links">
+            <h2>Quick Links</h2>
+            <form class="link-form">
+                <input type="text" class="link-name-input" placeholder="Link name" aria-label="Link name">
+                <input type="url" class="link-url-input" placeholder="https://example.com" aria-label="Link URL">
+                <button type="submit" class="btn-add-link">Add Link</button>
+            </form>
+            <div class="links-container"></div>
+        </section>
+
+        <div class="test-instructions">
+            <h3>Current State:</h3>
+            <p>Links in storage: <span id="link-count">0</span></p>
+            <button onclick="showStorageContents()">Show Storage Contents</button>
+            <button onclick="clearStorage()">Clear Storage</button>
+            <pre id="storage-contents" style="background: #f5f5f5; padding: 10px; margin-top: 10px; display: none;"></pre>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Update link count display
+        function updateLinkCount() {
+            const stored = localStorage.getItem('productivity-dashboard-links');
+            const links = stored ? JSON.parse(stored) : [];
+            document.getElementById('link-count').textContent = links.length;
+        }
+
+        function showStorageContents() {
+            const stored = localStorage.getItem('productivity-dashboard-links');
+            const pre = document.getElementById('storage-contents');
+            pre.textContent = stored ? JSON.stringify(JSON.parse(stored), null, 2) : 'No links in storage';
+            pre.style.display = 'block';
+            updateLinkCount();
+        }
+
+        function clearStorage() {
+            if (confirm('Clear all links from storage?')) {
+                localStorage.removeItem('productivity-dashboard-links');
+                location.reload();
+            }
+        }
+
+        // Update count on page load and periodically
+        updateLinkCount();
+        setInterval(updateLinkCount, 1000);
+
+        // Log form submissions to verify preventDefault
+        document.addEventListener('submit', (e) => {
+            console.log('Form submitted (preventDefault should prevent page reload)');
+        });
+    </script>
+</body>
+</html>

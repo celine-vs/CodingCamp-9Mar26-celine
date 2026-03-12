@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreetingWidget Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .pass { color: green; }
+        .fail { color: red; }
+        h2 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <h1>GreetingWidget Test Results</h1>
+    
+    <div class="test-section">
+        <h2>Live Display Test</h2>
+        <div class="greeting-widget">
+            <div class="time-display"></div>
+            <div class="date-display"></div>
+            <div class="greeting-message"></div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Unit Tests</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Run tests after a short delay to ensure GreetingWidget is initialized
+        setTimeout(() => {
+            const results = [];
+            
+            // Test 1: getGreeting for Morning (5-11)
+            results.push({
+                name: 'Morning greeting (5-11)',
+                pass: GreetingWidget.getGreeting(5) === 'Good Morning' &&
+                      GreetingWidget.getGreeting(8) === 'Good Morning' &&
+                      GreetingWidget.getGreeting(11) === 'Good Morning'
+            });
+            
+            // Test 2: getGreeting for Afternoon (12-16)
+            results.push({
+                name: 'Afternoon greeting (12-16)',
+                pass: GreetingWidget.getGreeting(12) === 'Good Afternoon' &&
+                      GreetingWidget.getGreeting(14) === 'Good Afternoon' &&
+                      GreetingWidget.getGreeting(16) === 'Good Afternoon'
+            });
+            
+            // Test 3: getGreeting for Evening (17-20)
+            results.push({
+                name: 'Evening greeting (17-20)',
+                pass: GreetingWidget.getGreeting(17) === 'Good Evening' &&
+                      GreetingWidget.getGreeting(19) === 'Good Evening' &&
+                      GreetingWidget.getGreeting(20) === 'Good Evening'
+            });
+            
+            // Test 4: getGreeting for Night (21-4)
+            results.push({
+                name: 'Night greeting (21-4)',
+                pass: GreetingWidget.getGreeting(21) === 'Good Night' &&
+                      GreetingWidget.getGreeting(23) === 'Good Night' &&
+                      GreetingWidget.getGreeting(0) === 'Good Night' &&
+                      GreetingWidget.getGreeting(4) === 'Good Night'
+            });
+            
+            // Test 5: formatTime produces 12-hour format
+            const testDate = new Date('2024-01-15T14:30:45');
+            const formattedTime = GreetingWidget.formatTime(testDate);
+            results.push({
+                name: 'formatTime 12-hour format',
+                pass: formattedTime === '2:30:45 PM'
+            });
+            
+            // Test 6: formatTime handles midnight
+            const midnight = new Date('2024-01-15T00:30:45');
+            const midnightTime = GreetingWidget.formatTime(midnight);
+            results.push({
+                name: 'formatTime handles midnight',
+                pass: midnightTime === '12:30:45 AM'
+            });
+            
+            // Test 7: formatTime handles noon
+            const noon = new Date('2024-01-15T12:30:45');
+            const noonTime = GreetingWidget.formatTime(noon);
+            results.push({
+                name: 'formatTime handles noon',
+                pass: noonTime === '12:30:45 PM'
+            });
+            
+            // Test 8: formatDate produces readable format
+            const formattedDate = GreetingWidget.formatDate(testDate);
+            results.push({
+                name: 'formatDate readable format',
+                pass: formattedDate === 'Monday, January 15, 2024'
+            });
+            
+            // Test 9: DOM elements are updated
+            const timeElement = document.querySelector('.time-display');
+            const dateElement = document.querySelector('.date-display');
+            const greetingElement = document.querySelector('.greeting-message');
+            results.push({
+                name: 'DOM elements are populated',
+                pass: timeElement.textContent !== '' &&
+                      dateElement.textContent !== '' &&
+                      greetingElement.textContent !== ''
+            });
+            
+            // Display results
+            const resultsDiv = document.getElementById('test-results');
+            results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = result.pass ? 'pass' : 'fail';
+                div.textContent = `${result.pass ? '✓' : '✗'} ${result.name}`;
+                resultsDiv.appendChild(div);
+            });
+            
+            // Summary
+            const passed = results.filter(r => r.pass).length;
+            const total = results.length;
+            const summary = document.createElement('div');
+            summary.style.marginTop = '20px';
+            summary.style.fontWeight = 'bold';
+            summary.textContent = `Tests Passed: ${passed}/${total}`;
+            summary.className = passed === total ? 'pass' : 'fail';
+            resultsDiv.appendChild(summary);
+            
+        }, 100);
+    </script>
+</body>
+</html>

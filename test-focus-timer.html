@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Timer Test</title>
+</head>
+<body>
+    <h1>Focus Timer Test</h1>
+    <div id="test-results"></div>
+
+    <script>
+        // Simple test for FocusTimer formatTime function
+        const FocusTimer = {
+            state: {
+                duration: 1500,
+                remaining: 1500,
+                isRunning: false,
+                intervalId: null
+            },
+
+            formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                
+                const minutesStr = minutes.toString().padStart(2, '0');
+                const secondsStr = remainingSeconds.toString().padStart(2, '0');
+                
+                return `${minutesStr}:${secondsStr}`;
+            }
+        };
+
+        // Run tests
+        const results = document.getElementById('test-results');
+        const tests = [
+            { input: 1500, expected: '25:00', desc: '25 minutes (1500 seconds)' },
+            { input: 0, expected: '00:00', desc: 'Zero seconds' },
+            { input: 60, expected: '01:00', desc: 'One minute' },
+            { input: 125, expected: '02:05', desc: '2 minutes 5 seconds' },
+            { input: 3599, expected: '59:59', desc: '59 minutes 59 seconds' },
+            { input: 5, expected: '00:05', desc: '5 seconds' }
+        ];
+
+        let passed = 0;
+        let failed = 0;
+
+        tests.forEach(test => {
+            const result = FocusTimer.formatTime(test.input);
+            const success = result === test.expected;
+            
+            if (success) {
+                passed++;
+                results.innerHTML += `<p style="color: green;">✓ ${test.desc}: ${result}</p>`;
+            } else {
+                failed++;
+                results.innerHTML += `<p style="color: red;">✗ ${test.desc}: Expected ${test.expected}, got ${result}</p>`;
+            }
+        });
+
+        results.innerHTML += `<h2>Results: ${passed} passed, ${failed} failed</h2>`;
+    </script>
+</body>
+</html>
