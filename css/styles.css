@@ -555,9 +555,10 @@ section h2 {
 /* Link Form - Input and Button Layout */
 .link-form {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 /* Link Input Fields - Emphasized for Visual Hierarchy */
@@ -571,16 +572,15 @@ section h2 {
     color: var(--text-primary);
     transition: all 0.2s ease;
     font-family: inherit;
+    min-width: 0;
 }
 
 .link-name-input {
-    flex: 1;
-    min-width: 0;
+    flex: 1 1 120px;
 }
 
 .link-url-input {
-    flex: 2;
-    min-width: 0;
+    flex: 1.5 1 150px;
 }
 
 /* Link Input Focus State - Clear Visual Feedback */
@@ -610,6 +610,7 @@ section h2 {
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* Add Link Button Hover State - Clear Visual Feedback */
@@ -917,3 +918,6 @@ button:focus-visible,
         border: 2px solid currentColor;
     }
 }
+
+
+

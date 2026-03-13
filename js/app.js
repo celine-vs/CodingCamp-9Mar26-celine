@@ -7,12 +7,61 @@
 // Greeting Widget Component
 const GreetingWidget = {
     /**
+     * Local Storage key for user name
+     */
+    storageKey: 'productivity-dashboard-username',
+
+    /**
      * Initialize the greeting widget and start the update loop
      */
     init() {
         this.update();
         // Update every second
         setInterval(() => this.update(), 1000);
+        
+        // Attach edit name button listener
+        const editNameBtn = document.querySelector('.btn-edit-name');
+        if (editNameBtn) {
+            editNameBtn.addEventListener('click', () => this.editName());
+        }
+    },
+
+    /**
+     * Get user name from Local Storage
+     * @returns {string} User name or empty string
+     */
+    getUserName() {
+        try {
+            return localStorage.getItem(this.storageKey) || '';
+        } catch (error) {
+            console.error('Error loading user name:', error);
+            return '';
+        }
+    },
+
+    /**
+     * Save user name to Local Storage
+     * @param {string} name - User name to save
+     */
+    saveUserName(name) {
+        try {
+            localStorage.setItem(this.storageKey, name);
+        } catch (error) {
+            console.error('Error saving user name:', error);
+        }
+    },
+
+    /**
+     * Prompt user to edit their name
+     */
+    editName() {
+        const currentName = this.getUserName();
+        const newName = prompt('Enter your name:', currentName);
+        
+        if (newName !== null) {
+            this.saveUserName(newName.trim());
+            this.update();
+        }
     },
 
     /**
@@ -36,7 +85,9 @@ const GreetingWidget = {
         // Update greeting message
         const greetingElement = document.querySelector('.greeting-message');
         if (greetingElement) {
-            greetingElement.textContent = this.getGreeting(now.getHours());
+            const userName = this.getUserName();
+            const greeting = this.getGreeting(now.getHours());
+            greetingElement.textContent = userName ? `${greeting}, ${userName}!` : greeting;
         }
     },
 
@@ -130,6 +181,7 @@ const FocusTimer = {
         const startBtn = document.querySelector('.btn-start');
         const stopBtn = document.querySelector('.btn-stop');
         const resetBtn = document.querySelector('.btn-reset');
+        const setDurationBtn = document.querySelector('.btn-set-duration');
         
         if (startBtn) {
             startBtn.addEventListener('click', () => this.start());
@@ -142,6 +194,35 @@ const FocusTimer = {
         if (resetBtn) {
             resetBtn.addEventListener('click', () => this.reset());
         }
+        
+        if (setDurationBtn) {
+            setDurationBtn.addEventListener('click', () => this.setDuration());
+        }
+    },
+
+    /**
+     * Set custom timer duration
+     */
+    setDuration() {
+        const input = document.querySelector('.timer-duration-input');
+        if (!input) return;
+        
+        const minutes = parseInt(input.value);
+        if (isNaN(minutes) || minutes < 1 || minutes > 120) {
+            alert('Please enter a valid duration between 1 and 120 minutes.');
+            return;
+        }
+        
+        // Stop timer if running
+        this.stop();
+        
+        // Set new duration
+        this.state.duration = minutes * 60;
+        this.state.remaining = this.state.duration;
+        
+        // Update display
+        this.updateDisplay();
+        this.updateButtonStates();
     },
 
     /**
@@ -229,14 +310,14 @@ const FocusTimer = {
     },
 
     /**
-     * Reset the timer to initial duration (25 minutes)
+     * Reset the timer to initial duration
      */
     reset() {
         // Stop the timer if running
         this.stop();
         
-        // Reset to 1500 seconds (25 minutes)
-        this.state.remaining = 1500;
+        // Reset to initial duration
+        this.state.remaining = this.state.duration;
         
         // Update display
         this.updateDisplay();
@@ -377,6 +458,17 @@ const TaskManager = {
             return null;
         }
 
+        // Check for duplicate tasks
+        const isDuplicate = this.tasks.some(task => 
+            task.description.toLowerCase() === trimmedDescription.toLowerCase()
+        );
+        
+        if (isDuplicate) {
+            console.warn('Cannot add task: duplicate task already exists');
+            alert('This task already exists!');
+            return null;
+        }
+
         // Create new task object
         const newTask = {
             id: this.generateId(),
@@ -480,6 +572,23 @@ const TaskManager = {
     },
 
     /**
+     * Sort tasks: incomplete first, then completed
+     */
+    sortTasks() {
+        this.tasks.sort((a, b) => {
+            // Incomplete tasks come first
+            if (a.completed !== b.completed) {
+                return a.completed ? 1 : -1;
+            }
+            // Within same completion status, sort by creation time
+            return a.createdAt - b.createdAt;
+        });
+        
+        this.saveTasks();
+        this.renderTasks();
+    },
+
+    /**
      * Attach event listeners for task form and interactions
      */
     attachEventListeners() {
@@ -490,6 +599,12 @@ const TaskManager = {
                 e.preventDefault();
                 this.handleTaskSubmit();
             });
+        }
+
+        // Sort button handler
+        const sortBtn = document.querySelector('.btn-sort-tasks');
+        if (sortBtn) {
+            sortBtn.addEventListener('click', () => this.sortTasks());
         }
 
         // Event delegation for task list interactions
@@ -916,18 +1031,26 @@ const QuickLinks = {
         anchor.href = link.url;
         anchor.target = '_blank';
         anchor.className = 'link-button';
-        anchor.textContent = link.name;
         anchor.setAttribute('rel', 'noopener noreferrer'); // Security best practice
+
+        // Create link name span
+        const linkName = document.createElement('span');
+        linkName.className = 'link-name';
+        linkName.textContent = link.name;
 
         // Create delete button
         const deleteButton = document.createElement('button');
         deleteButton.className = 'btn-delete-link';
         deleteButton.textContent = '×';
         deleteButton.setAttribute('aria-label', `Delete link: ${link.name}`);
+        deleteButton.setAttribute('type', 'button');
 
-        // Append elements to link item
+        // Append elements to anchor
+        anchor.appendChild(linkName);
+        anchor.appendChild(deleteButton);
+
+        // Append anchor to link item
         linkItem.appendChild(anchor);
-        linkItem.appendChild(deleteButton);
 
         return linkItem;
     },
@@ -966,6 +1089,8 @@ const QuickLinks = {
             linksContainer.addEventListener('click', (e) => {
                 // Handle delete button
                 if (e.target.classList.contains('btn-delete-link')) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     const linkItem = e.target.closest('.link-item');
                     if (linkItem) {
                         const linkId = linkItem.getAttribute('data-link-id');
@@ -1080,6 +1205,11 @@ const QuickLinks = {
 // Application Controller
 const App = {
     /**
+     * Local Storage key for theme preference
+     */
+    themeStorageKey: 'productivity-dashboard-theme',
+
+    /**
      * Check if Local Storage is available
      * @returns {boolean} True if Local Storage is available, false otherwise
      */
@@ -1118,6 +1248,76 @@ const App = {
     },
 
     /**
+     * Load theme preference from Local Storage
+     * @returns {string} Theme preference ('light' or 'dark')
+     */
+    loadTheme() {
+        try {
+            return localStorage.getItem(this.themeStorageKey) || 'light';
+        } catch (error) {
+            console.error('Error loading theme:', error);
+            return 'light';
+        }
+    },
+
+    /**
+     * Save theme preference to Local Storage
+     * @param {string} theme - Theme preference ('light' or 'dark')
+     */
+    saveTheme(theme) {
+        try {
+            localStorage.setItem(this.themeStorageKey, theme);
+        } catch (error) {
+            console.error('Error saving theme:', error);
+        }
+    },
+
+    /**
+     * Toggle between light and dark mode
+     */
+    toggleTheme() {
+        const body = document.body;
+        const themeBtn = document.querySelector('.btn-theme-toggle');
+        
+        if (body.classList.contains('dark-mode')) {
+            body.classList.remove('dark-mode');
+            if (themeBtn) themeBtn.textContent = '🌙';
+            this.saveTheme('light');
+        } else {
+            body.classList.add('dark-mode');
+            if (themeBtn) themeBtn.textContent = '☀️';
+            this.saveTheme('dark');
+        }
+    },
+
+    /**
+     * Apply saved theme on page load
+     */
+    applyTheme() {
+        const theme = this.loadTheme();
+        const body = document.body;
+        const themeBtn = document.querySelector('.btn-theme-toggle');
+        
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (themeBtn) themeBtn.textContent = '☀️';
+        } else {
+            body.classList.remove('dark-mode');
+            if (themeBtn) themeBtn.textContent = '🌙';
+        }
+    },
+
+    /**
+     * Initialize theme toggle button
+     */
+    initThemeToggle() {
+        const themeBtn = document.querySelector('.btn-theme-toggle');
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => this.toggleTheme());
+        }
+    },
+
+    /**
      * Initialize the application and all components
      */
     init() {
@@ -1126,6 +1326,12 @@ const App = {
             console.warn('Local Storage is not available. Data will not persist.');
             this.displayStorageWarning();
         }
+
+        // Apply saved theme
+        this.applyTheme();
+
+        // Initialize theme toggle
+        this.initThemeToggle();
 
         // Initialize all components in order
         console.log('Productivity Dashboard initialized');
