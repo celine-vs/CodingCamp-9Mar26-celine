@@ -1,11 +1,5 @@
 /* Productivity Dashboard Styles */
 
-/* CSS Reset and Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
 /* CSS Custom Properties */
 :root {
@@ -19,6 +13,19 @@
     --border-color: #e1e8ed;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --button-theme-background: black;
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+    --background-color: #1a1a2e;
+    --card-background: #16213e;
+    --text-primary: #eaeaea;
+    --text-secondary: #e5e1e1;
+    --border-color: #2a2a3e;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --button-theme-background: white;
 }
 
 body {
@@ -29,9 +36,69 @@ body {
     min-height: 100vh;
 }
 
+body,
+section,
+input,
+button {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Better header layout */
+.dashboard-header {
+    display: flex;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+
+.header-controls {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.btn-theme-toggle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--button-theme-background);
+}
+
+
+/* Cleaner greeting widget */
+.btn-edit-name {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.btn-edit-name:hover {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    transform: scale(1.05) !important;
+}
+
+
+.btn-set-duration {
+    padding: 0.5rem 1.25rem !important;
+    border-radius: 20px !important;
+    min-width: auto !important;
+    border: 0;
+    color: white;
+    background-color: var(--primary-color);
+    margin-left: 5px;
+}
+
+
 /* Dashboard Container - Grid Layout */
 .dashboard-container {
-    max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
     display: grid;
@@ -39,24 +106,18 @@ body {
     gap: 1.5rem;
 }
 
-/* Responsive Grid Layout */
 @media (min-width: 768px) {
     .dashboard-container {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .dashboard-header {
         grid-column: 1 / -1;
     }
-    
+
     .greeting-widget {
         grid-column: 1 / -1;
     }
-}
-
-.dashboard-header {
-    text-align: center;
-    margin-bottom: 1rem;
 }
 
 .dashboard-header h1 {
@@ -75,31 +136,58 @@ section {
     transition: box-shadow 0.3s ease;
 }
 
-section:hover {
-    box-shadow: var(--shadow-hover);
-}
-
 section h2 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
     color: var(--text-primary);
-    font-weight: 600;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0.5rem;
+    font-weight: 700;
 }
 
-/* Greeting Widget - Visual Hierarchy */
-.greeting-widget {
-    text-align: center;
-    padding: 2.5rem 1.5rem;
-    background: linear-gradient(135deg, var(--primary-color), #357abd);
-    color: white;
+.timer-settings {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
+
+.timer-settings label {
+    font-weight: 600;
+}
+
+.timer-duration-input {
+    width: 80px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--card-background);
+    color: var(--text-primary)
+}
+
+.btn-set-duration {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-set-duration:hover {
+    background-color: #357abd;
+    transform: translateY(-1px);
+}
+
+
+.btn-edit-name:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
 
 /* Time Display - Large, Readable Font */
 .greeting-widget .time-display {
@@ -108,6 +196,8 @@ section h2 {
     letter-spacing: 0.05em;
     line-height: 1.2;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+    text-align: center;
 }
 
 /* Date Display - Medium Font */
@@ -116,6 +206,8 @@ section h2 {
     font-weight: 400;
     opacity: 0.9;
     letter-spacing: 0.02em;
+    color: white;
+    text-align: center;
 }
 
 /* Greeting Message - Emphasized */
@@ -126,10 +218,7 @@ section h2 {
     margin-top: 0.5rem;
     font-style: italic;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Focus Timer Styles */
-.focus-timer {
+    color: white;
     text-align: center;
 }
 
@@ -146,6 +235,7 @@ section h2 {
     border-radius: 8px;
     border: 2px solid var(--border-color);
     transition: all 0.3s ease;
+    text-align: center;
 }
 
 /* Timer Complete State - Visual Indication */
@@ -157,9 +247,12 @@ section h2 {
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.05);
     }
@@ -175,15 +268,32 @@ section h2 {
 
 /* Timer Control Buttons - Base Styles */
 .timer-controls button {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
+    /* Task Manager Styles */
     border: none;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+
+.btn-sort-tasks {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background-color: #7f8c8d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-sort-tasks:hover {
+    background-color: #6c7a89;
+    transform: translateY(-1px);
+}
+
 
 /* Start Button - Primary Action */
 .btn-start {
@@ -266,7 +376,6 @@ section h2 {
     min-height: 1.5rem;
 }
 
-/* Task Manager Styles */
 
 /* Task Form - Input and Button Layout */
 .task-form {
@@ -335,6 +444,8 @@ section h2 {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    width: 100%;
+    padding: 0;
 }
 
 /* Task Item - Card-like Appearance with Visual Hierarchy */
@@ -447,9 +558,6 @@ section h2 {
 }
 
 /* Edit Mode - Inline Editing Styles */
-.task-item.editing .task-description {
-    display: none;
-}
 
 .task-item.editing .task-edit-input {
     display: block;
@@ -457,7 +565,6 @@ section h2 {
 
 /* Task Edit Input - Inline Editing */
 .task-edit-input {
-    display: none;
     flex: 1;
     padding: 0.5rem;
     font-size: 1rem;
@@ -523,6 +630,7 @@ section h2 {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -550,6 +658,7 @@ section h2 {
     border-color: var(--danger-color);
     box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
 }
+
 /* Quick Links Styles */
 
 /* Link Form - Input and Button Layout */
@@ -558,7 +667,6 @@ section h2 {
     flex-direction: row;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
-    flex-wrap: wrap;
 }
 
 /* Link Input Fields - Emphasized for Visual Hierarchy */
@@ -572,16 +680,8 @@ section h2 {
     color: var(--text-primary);
     transition: all 0.2s ease;
     font-family: inherit;
-    min-width: 0;
 }
 
-.link-name-input {
-    flex: 1 1 120px;
-}
-
-.link-url-input {
-    flex: 1.5 1 150px;
-}
 
 /* Link Input Focus State - Clear Visual Feedback */
 .link-name-input:focus,
@@ -645,14 +745,15 @@ section h2 {
 
 /* Link Button - Styled as Card/Pill with Visual Hierarchy */
 .link-button {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 1rem 1.25rem;
-    background-color: var(--card-background);
+    background-color: var(--primary-color);
     border: 2px solid var(--border-color);
     border-radius: 12px;
-    color: var(--text-primary);
+    color: white;
     text-decoration: none;
     font-size: 1rem;
     font-weight: 600;
@@ -662,6 +763,11 @@ section h2 {
     cursor: pointer;
     word-break: break-word;
     min-height: 80px;
+}
+
+/* Link name span */
+.link-name {
+    flex: 1;
 }
 
 /* Link Button Hover State - Clear Visual Feedback */
@@ -681,33 +787,39 @@ section h2 {
     transform: translateY(-1px) scale(1);
 }
 
-/* Delete Link Button - Danger Action with Clear Affordance */
+/* Delete Link Button - Positioned inside link button */
 .btn-delete-link {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    background-color: var(--danger-color);
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1;
+    font-weight: 500;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    z-index: 10;
+    background-color: var(--primary-color);
 }
 
-/* Delete Link Button Hover State - Clear Visual Feedback */
-.btn-delete-link:hover {
-    background-color: #c0392b;
-    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
-    transform: translateY(-2px);
+/* Show delete button on link hover */
+.link-button:hover .btn-delete-link {
+    color: white;
+    background-color: var(--primary-color);
 }
 
-/* Delete Link Button Active State - Click Feedback */
-.btn-delete-link:active {
-    background-color: #a93226;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    transform: translateY(0);
+.link-button:active {
+    color: white;
+    background-color: #357abd;
 }
 
 /* Empty State for Links Container */
@@ -725,26 +837,24 @@ section h2 {
 @media (min-width: 480px) {
     .link-form {
         flex-direction: row;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
     }
-    
-    .link-name-input,
+
+    .link-name-input {
+        flex: 1 1 100px;
+        min-width: 100px;
+    }
+
     .link-url-input {
-        flex: 1;
-        min-width: 200px;
+        flex: 1.5 1 120px;
+        min-width: 120px;
     }
-    
+
     .btn-add-link {
         flex-shrink: 0;
     }
 }
 
-/* ===================================
-   ACCESSIBILITY ENHANCEMENTS
-   =================================== */
-
-/* Keyboard Focus Styles - Visible Focus Indicators */
-/* All interactive elements get a clear focus outline */
 
 /* Button Focus Styles */
 button:focus-visible,
@@ -834,38 +944,32 @@ button:focus-visible,
     /* Checkbox gets 12px padding on all sides from container = 24px + 20px = 44px touch target */
 }
 
-/* Contrast Ratio Verification - WCAG AA Compliance */
-/* All text colors verified against backgrounds for 4.5:1 (normal) or 3:1 (large text) */
-
-/* Primary text on white background: #2c3e50 on #ffffff = 12.6:1 ✓ */
-/* Secondary text on white background: #7f8c8d on #ffffff = 4.54:1 ✓ */
-/* White text on primary blue: #ffffff on #4a90e2 = 3.37:1 (large text only) */
-/* White text on gradient blue: #ffffff on #357abd = 4.51:1 ✓ */
-
 /* Enhanced contrast for greeting widget - ensure WCAG AA compliance */
 .greeting-widget {
     /* Using darker blue gradient for better contrast with white text */
     background: linear-gradient(135deg, #357abd, #2e6ba8);
     /* White on #357abd = 4.51:1 ✓ (meets AA for large text) */
-    /* White on #2e6ba8 = 5.24:1 ✓ (meets AA for normal text) */
 }
 
 /* Timer complete state - ensure sufficient contrast */
 .timer-display.complete {
-    background-color: #45b369; /* Darker green for better contrast */
+    background-color: #45b369;
+    /* Darker green for better contrast */
     /* White on #45b369 = 3.24:1 ✓ (meets AA for large text 3:1) */
 }
 
 /* Completed task text - ensure readable contrast */
 .task-item.completed .task-description {
-    color: #5a6978; /* Darker gray for better contrast when combined with opacity */
+    color: #5a6978;
+    /* Darker gray for better contrast when combined with opacity */
     /* #5a6978 on #f8f9fa with 0.6 opacity still maintains ~4.5:1 contrast */
 }
 
 /* Storage warning - ensure sufficient contrast */
 .storage-warning {
     background-color: #fff3cd;
-    color: #664d03; /* Darker text for better contrast */
+    color: #664d03;
+    /* Darker text for better contrast */
     /* #664d03 on #fff3cd = 8.35:1 ✓ */
 }
 
@@ -887,6 +991,7 @@ button:focus-visible,
 
 /* Reduced motion support for users with vestibular disorders */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -895,7 +1000,7 @@ button:focus-visible,
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
-    
+
     .timer-display.complete {
         animation: none;
     }
@@ -911,13 +1016,10 @@ button:focus-visible,
         --text-secondary: #333333;
         --border-color: #000000;
     }
-    
+
     button,
     input,
     .link-button {
         border: 2px solid currentColor;
     }
 }
-
-
-
